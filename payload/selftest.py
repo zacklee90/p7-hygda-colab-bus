@@ -31,16 +31,31 @@ RUN_DIR = Path(os.environ["P7_RUN_DIR"])
 REPO_DIR = Path(__file__).resolve().parent.parent
 LOCK_PATH = REPO_DIR / "payload" / "requirements.lock"
 
-#: Narrow set that actually matters. torch/torchvision are deliberately absent.
-CANDIDATES = [
-    "diffusers==0.30.3",
-    "transformers==4.44.2",
-    "accelerate==0.33.0",
-    "peft==0.12.0",
-    "huggingface_hub==0.24.6",
-    "safetensors==0.4.5",
-    "datasets==2.21.0",
-]
+# Narrow set that actually matters. torch/torchvision are deliberately absent (rule zero).
+#
+# Measured runtime on 2026-09-16: Colab ships Python 3.13.15 with torch 2.11.0+cu128. The
+# 2024-era pins this project inherited from the prototype (transformers 4.44, accelerate
+# 0.33) predate Python 3.13 entirely, so demanding them would fail before it taught us
+# anything. Instead the FIRST mint resolves unpinned - and then verifies, which is the
+# part the prototype skipped: pip check, import every package, and run five real training
+# steps. Only a set that survives all three becomes the lock. "Install latest and hope" is
+# what broke the old notebook; "install latest, prove it trains, then freeze it forever"
+# is a different thing.
+#
+# DEP_SET lets the auto-fix loop switch strategies without a code edit.
+DEP_SETS: dict[str, list[str]] = {
+    "latest": [
+        "diffusers", "transformers", "accelerate", "peft",
+        "huggingface_hub", "safetensors", "datasets",
+    ],
+    "pinned_2024": [
+        "diffusers==0.30.3", "transformers==4.44.2", "accelerate==0.33.0",
+        "peft==0.12.0", "huggingface_hub==0.24.6", "safetensors==0.4.5",
+        "datasets==2.21.0",
+    ],
+}
+DEP_SET = os.environ.get("DEP_SET", "latest")
+CANDIDATES = DEP_SETS.get(DEP_SET, DEP_SETS["latest"])
 
 MODEL_CANDIDATES = [
     "stable-diffusion-v1-5/stable-diffusion-v1-5",
@@ -160,14 +175,28 @@ def five_training_steps(model_id: str, revision: str) -> float:
 
 def main() -> int:
     """Install, verify, resolve, train five steps, and emit the lock."""
-    print("=== P7 selftest: mint a dependency lock by observation ===", flush=True)
+    print(f"=== P7 selftest: mint a dependency lock by observation (DEP_SET={DEP_SET}) ===",
+          flush=True)
+    print(f"python {sys.version.split()[0]}", flush=True)
     install(CANDIDATES)
 
     print("\n--- pip check ---", flush=True)
     check = run([sys.executable, "-m", "pip", "check"])
-    if check.returncode != 0:
-        print("pip check reported conflicts - refusing to certify this environment", flush=True)
+    # Colab's base image nearly always has some unrelated conflict (it ships hundreds of
+    # packages). Failing on any of them would reject a perfectly good environment, so only
+    # a conflict naming one of OUR packages counts.
+    ours = {spec.split("==")[0].strip().lower().replace("_", "-") for spec in CANDIDATES}
+    ours |= {"torch", "torchvision"}
+    relevant = [ln for ln in (check.stdout or "").splitlines()
+                if any(name in ln.lower() for name in ours)]
+    if relevant:
+        print("pip check conflicts involving our packages - refusing to certify:", flush=True)
+        for ln in relevant:
+            print(f"  {ln}", flush=True)
         return 1
+    if check.returncode != 0:
+        print("pip check reported conflicts, none involving our packages - continuing",
+              flush=True)
 
     print("\n--- import smoke test ---", flush=True)
     versions = smoke_imports()
@@ -180,12 +209,17 @@ def main() -> int:
 
     print("\n--- pip freeze ---", flush=True)
     freeze = run([sys.executable, "-m", "pip", "freeze"]).stdout
-    keep = {spec.split("==")[0].lower().replace("_", "-") for spec in CANDIDATES}
+    keep = {spec.split("==")[0].strip().lower().replace("_", "-") for spec in CANDIDATES}
     keep |= {"torch", "torchvision", "numpy", "bitsandbytes"}
     lock_lines = sorted(
         ln.strip() for ln in freeze.splitlines()
         if "==" in ln and ln.split("==")[0].strip().lower().replace("_", "-") in keep
     )
+
+    if len(lock_lines) < len(CANDIDATES):
+        print(f"freeze produced only {len(lock_lines)} pinned lines for {len(CANDIDATES)} "
+              f"packages - refusing to certify an incomplete lock", flush=True)
+        return 1
 
     import torch
     snapshot = {

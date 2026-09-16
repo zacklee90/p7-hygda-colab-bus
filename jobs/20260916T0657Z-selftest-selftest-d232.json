@@ -1,0 +1,22 @@
+{
+  "attempt": 1,
+  "created_utc": "2026-09-16T06:57:39Z",
+  "deps_lock_sha256": null,
+  "drive_run_dir": "runs/misc",
+  "env": {},
+  "fix_note": null,
+  "idempotency_key": "dep_lock_mint",
+  "job_id": "20260916T0657Z-selftest-selftest-d232",
+  "kind": "selftest",
+  "parent_job_id": null,
+  "payload_args": [],
+  "payload_entry": "payload/selftest.py",
+  "requires": {
+    "gpu": true,
+    "min_vram_gb": 0
+  },
+  "resume": true,
+  "schema_version": 1,
+  "stall_s": 600,
+  "timeout_s": 2400
+}
