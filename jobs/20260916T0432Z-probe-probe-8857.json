@@ -1,0 +1,22 @@
+{
+  "attempt": 1,
+  "created_utc": "2026-09-16T04:32:54Z",
+  "deps_lock_sha256": null,
+  "drive_run_dir": "runs/misc",
+  "env": {},
+  "fix_note": null,
+  "idempotency_key": "bus_smoke_test",
+  "job_id": "20260916T0432Z-probe-probe-8857",
+  "kind": "probe",
+  "parent_job_id": null,
+  "payload_args": [],
+  "payload_entry": "payload/probe.py",
+  "requires": {
+    "gpu": false,
+    "min_vram_gb": 0
+  },
+  "resume": true,
+  "schema_version": 1,
+  "stall_s": 300,
+  "timeout_s": 600
+}
