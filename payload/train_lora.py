@@ -35,7 +35,9 @@ from pathlib import Path
 from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "agent"))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 import driveio  # noqa: E402
+from envfix import neutralize_torchao  # noqa: E402
 
 REPO_DIR = Path(__file__).resolve().parent.parent
 RUN_DIR = Path(os.environ["P7_RUN_DIR"])
@@ -113,6 +115,8 @@ def verify_environment() -> dict[str, str]:
                            check=False, timeout=1800)
     else:
         say("no requirements.lock yet - run the selftest job first to mint one")
+
+    neutralize_torchao()
 
     versions: dict[str, str] = {}
     for name in ("torch", "diffusers", "transformers", "accelerate", "peft", "safetensors"):
