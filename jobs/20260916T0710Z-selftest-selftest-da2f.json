@@ -1,0 +1,24 @@
+{
+  "attempt": 4,
+  "created_utc": "2026-09-16T07:10:32Z",
+  "deps_lock_sha256": null,
+  "drive_run_dir": "runs/misc",
+  "env": {},
+  "fix_class": "DEPENDENCY_CONFLICT",
+  "fix_note": "Same torchao fix as attempt 3, which never executed it: attempt 3 ran at 72151a0c, a commit carrying the job and envfix.py but not the selftest.py change that calls it. Code is at 00493e0a now.",
+  "idempotency_key": "dep_lock_mint",
+  "job_id": "20260916T0710Z-selftest-selftest-da2f",
+  "kind": "selftest",
+  "parent_job_id": "20260916T0706Z-selftest-selftest-5596",
+  "payload_args": [],
+  "payload_entry": "payload/selftest.py",
+  "requires": {
+    "gpu": true,
+    "min_vram_gb": 0
+  },
+  "responding_to": "ac9fd83c2b5bd180b4803e025e402b77d1f94be1",
+  "resume": true,
+  "schema_version": 1,
+  "stall_s": 600,
+  "timeout_s": 2400
+}
