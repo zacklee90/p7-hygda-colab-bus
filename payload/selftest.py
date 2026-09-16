@@ -130,46 +130,85 @@ def resolve_model() -> tuple[str, str]:
 
 
 def five_training_steps(model_id: str, revision: str) -> float:
-    """Run five real optimizer steps to prove the stack trains, not merely imports.
+    """Run five real LoRA optimizer steps to prove the stack trains, not merely imports.
 
-    Uses a tiny synthetic batch rather than the real dataset so the check stays under a
-    minute and needs no Drive I/O.
+    This deliberately mirrors what the real job does, because the first version of this
+    check did not and produced a misleading pass. It trained the FULL UNet with fp16
+    master weights and no gradient scaler; loss went to ``nan`` on step 2 while the job
+    still reported success, and the images/second it measured described full-UNet training
+    rather than LoRA. Both numbers were useless.
+
+    What accelerate actually does for ``mixed_precision="fp16"`` - and therefore what this
+    now does - is keep fp32 master weights, run the forward under ``autocast``, and scale
+    the loss. Only the LoRA adapters are trainable.
 
     Args:
         model_id: resolved base model.
         revision: commit sha to pin.
 
     Returns:
-        Measured images/second, used to recompute the campaign's compute-unit budget.
+        Measured images/second for LoRA training, used to recompute the CU budget.
+
+    Raises:
+        SystemExit: if the loss is not finite - a stack that produces ``nan`` in five
+            steps has not been certified, whatever the exit code says.
     """
+    import math
+
     import torch
+    import torch.nn.functional as F
     from diffusers import UNet2DConditionModel
+    from peft import LoraConfig
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    dtype = torch.float16 if device == "cuda" else torch.float32
+    rank = int(os.environ.get("RANK", "32"))
+    alpha = int(os.environ.get("LORA_ALPHA", "16"))
+    batch = int(os.environ.get("TRAIN_BATCH_SIZE", "2"))
+
     unet = UNet2DConditionModel.from_pretrained(
-        model_id, subfolder="unet", revision=revision or None, torch_dtype=dtype
+        model_id, subfolder="unet", revision=revision or None, torch_dtype=torch.float32
     ).to(device)
+    unet.requires_grad_(False)
+    unet.add_adapter(LoraConfig(
+        r=rank, lora_alpha=alpha, init_lora_weights="gaussian",
+        target_modules=["to_q", "to_k", "to_v", "to_out.0"],
+    ))
     unet.enable_gradient_checkpointing()
     unet.train()
 
-    opt = torch.optim.AdamW([p for p in unet.parameters() if p.requires_grad], lr=1e-6)
-    batch = 2
-    latents = torch.randn(batch, 4, 64, 64, device=device, dtype=dtype)
-    emb = torch.randn(batch, 77, 768, device=device, dtype=dtype)
+    params = [p for p in unet.parameters() if p.requires_grad]
+    n_train = sum(p.numel() for p in params)
+    n_total = sum(p.numel() for p in unet.parameters())
+    print(f"  trainable {n_train / 1e6:.2f} M of {n_total / 1e6:.1f} M "
+          f"({100 * n_train / n_total:.2f} %), rank={rank} alpha={alpha}", flush=True)
+
+    opt = torch.optim.AdamW(params, lr=1e-4)
+    scaler = torch.amp.GradScaler(device, enabled=(device == "cuda"))
+
+    latents = torch.randn(batch, 4, 64, 64, device=device)
+    emb = torch.randn(batch, 77, 768, device=device)
+    target = torch.randn_like(latents)
     timesteps = torch.randint(0, 1000, (batch,), device=device).long()
 
     t0 = time.time()
     for step in range(5):
-        pred = unet(latents, timesteps, encoder_hidden_states=emb).sample
-        loss = pred.float().pow(2).mean()
-        loss.backward()
-        opt.step()
+        with torch.autocast(device, dtype=torch.float16, enabled=(device == "cuda")):
+            pred = unet(latents, timesteps, encoder_hidden_states=emb).sample
+        loss = F.mse_loss(pred.float(), target.float())
+        scaler.scale(loss).backward()
+        scaler.step(opt)
+        scaler.update()
         opt.zero_grad(set_to_none=True)
-        print(f"  step {step + 1}/5 loss={loss.item():.4f}", flush=True)
+        value = loss.item()
+        print(f"  step {step + 1}/5 loss={value:.4f}", flush=True)
+        if not math.isfinite(value):
+            raise SystemExit(
+                f"loss became {value} at step {step + 1} - refusing to certify a stack "
+                f"that diverges in five steps"
+            )
     dt = time.time() - t0
     ips = (5 * batch) / dt
-    print(f"  5 steps in {dt:.1f}s -> {ips:.2f} img/s on {device}", flush=True)
+    print(f"  5 LoRA steps in {dt:.1f}s -> {ips:.2f} img/s on {device}", flush=True)
     return ips
 
 

@@ -1,0 +1,22 @@
+{
+  "attempt": 2,
+  "created_utc": "2026-09-16T07:02:08Z",
+  "deps_lock_sha256": null,
+  "drive_run_dir": "runs/misc",
+  "env": {},
+  "fix_note": "five_training_steps trained the full UNet with fp16 master weights and no GradScaler: loss hit nan at step 2 while the job still reported success, and the img/s described full-UNet not LoRA. Now mirrors accelerate: fp32 master weights, autocast fp16 + GradScaler, LoRA adapters only, and a finite-loss assertion.",
+  "idempotency_key": "dep_lock_mint",
+  "job_id": "20260916T0702Z-selftest-selftest-6a2c",
+  "kind": "selftest",
+  "parent_job_id": "20260916T0657Z-selftest-selftest-d232",
+  "payload_args": [],
+  "payload_entry": "payload/selftest.py",
+  "requires": {
+    "gpu": true,
+    "min_vram_gb": 0
+  },
+  "resume": true,
+  "schema_version": 1,
+  "stall_s": 600,
+  "timeout_s": 2400
+}
