@@ -25,7 +25,9 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "agent"))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 import driveio  # noqa: E402
+from envfix import neutralize_torchao  # noqa: E402
 
 RUN_DIR = Path(os.environ["P7_RUN_DIR"])
 REPO_DIR = Path(__file__).resolve().parent.parent
@@ -219,6 +221,9 @@ def main() -> int:
     print(f"python {sys.version.split()[0]}", flush=True)
     install(CANDIDATES)
 
+    print("\n--- environment repairs ---", flush=True)
+    removed = neutralize_torchao()
+
     print("\n--- pip check ---", flush=True)
     check = run([sys.executable, "-m", "pip", "check"])
     # Colab's base image nearly always has some unrelated conflict (it ships hundreds of
@@ -269,6 +274,7 @@ def main() -> int:
         "img_per_s_5step": round(ips, 2),
         "gpu": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
         "lock_lines": lock_lines,
+        "torchao_removed": removed,
         "t_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
     }
     driveio.write_json_atomic(RUN_DIR / "env_snapshot.json", snapshot)
