@@ -118,6 +118,11 @@ class Job:
     attempt: int = 1
     parent_job_id: str | None = None
     fix_note: str | None = None
+    #: The fix carried by THIS attempt, and the failure signature it answers. Recorded at
+    #: submit time - not derived from the outcome, which is a different thing entirely:
+    #: the failure class an attempt PRODUCES says nothing about the fix it CARRIED.
+    fix_class: str | None = None
+    responding_to: str | None = None
     created_utc: str = field(default_factory=utc_now)
     timeout_s: int = 43200
     stall_s: int = 900
