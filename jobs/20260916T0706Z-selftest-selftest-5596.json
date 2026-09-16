@@ -1,0 +1,24 @@
+{
+  "attempt": 3,
+  "created_utc": "2026-09-16T07:06:43Z",
+  "deps_lock_sha256": null,
+  "drive_run_dir": "runs/misc",
+  "env": {},
+  "fix_class": "DEPENDENCY_CONFLICT",
+  "fix_note": "peft 0.20 raises rather than returns False from is_torchao_available() when torchao is installed but older than 0.16.0; Colab ships 0.10.0. Uninstall torchao instead of upgrading it: we never use it, and upgrading risks pip choosing a torchao wheel built for a different torch. Applied in both selftest and train_lora, since the real job calls add_adapter identically.",
+  "idempotency_key": "dep_lock_mint",
+  "job_id": "20260916T0706Z-selftest-selftest-5596",
+  "kind": "selftest",
+  "parent_job_id": "20260916T0702Z-selftest-selftest-6a2c",
+  "payload_args": [],
+  "payload_entry": "payload/selftest.py",
+  "requires": {
+    "gpu": true,
+    "min_vram_gb": 0
+  },
+  "responding_to": "ac9fd83c2b5bd180b4803e025e402b77d1f94be1",
+  "resume": true,
+  "schema_version": 1,
+  "stall_s": 600,
+  "timeout_s": 2400
+}
