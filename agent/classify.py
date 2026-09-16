@@ -42,7 +42,11 @@ _PATTERNS: list[tuple[str, re.Pattern[str]]] = [
         r"|BadZipFile|does not appear to have a file named", re.I)),
 ]
 
-_EXC_RE = re.compile(r"^(?:\w+\.)*(\w*(?:Error|Exception|Exit|Interrupt|Warning))\s*:\s*(.*)$")
+# Warnings are deliberately NOT matched. This scans backwards for the LAST exception
+# line, so a warning printed after the real traceback would shadow the actual cause -
+# observed 2026-09-16, when a cancelled job recorded an HF Hub rate-limit warning as
+# its message instead of the reason it stopped.
+_EXC_RE = re.compile(r"^(?:\w+\.)*(\w*(?:Error|Exception|Exit|Interrupt))\s*:\s*(.*)$")
 _FRAME_RE = re.compile(r'^\s*File "([^"]+)", line (\d+)')
 
 #: A traceback frame under one of these path fragments is code we wrote and may fix.

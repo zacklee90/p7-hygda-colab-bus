@@ -1,0 +1,27 @@
+{
+  "attempt": 1,
+  "created_utc": "2026-09-16T08:03:42Z",
+  "deps_lock_sha256": "08d893a9ffab49a23eb4445234e374649eb0fc98a25e298b3dc705ed6beb88eb",
+  "drive_run_dir": "runs/misc",
+  "env": {
+    "DEPS_LOCK_SHA256": "08d893a9ffab49a23eb4445234e374649eb0fc98a25e298b3dc705ed6beb88eb",
+    "RUN_ID": "clean_pilot_s150"
+  },
+  "fix_class": null,
+  "fix_note": null,
+  "idempotency_key": "clean_local_s150",
+  "job_id": "20260916T0803Z-python-python-21fc",
+  "kind": "python",
+  "parent_job_id": null,
+  "payload_args": [],
+  "payload_entry": "payload/clean_local_run.py",
+  "requires": {
+    "gpu": false,
+    "min_vram_gb": 0
+  },
+  "responding_to": null,
+  "resume": true,
+  "schema_version": 1,
+  "stall_s": 300,
+  "timeout_s": 600
+}
