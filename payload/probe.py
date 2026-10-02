@@ -60,7 +60,7 @@ def main() -> int:
     drive = Path("/content/drive/MyDrive/p7-hygda")
     print(f"drive    : mounted={drive.is_dir()}")
     if drive.is_dir():
-        for name in ("hf_dataset_v3_clean.zip", "hf_dataset_v3_labeled.zip", "default.yaml"):
+        for name in ("hf_dataset_v4_clean.zip", "hf_dataset_v3_clean.zip", "default.yaml"):
             p = drive / name
             print(f"  {name:<28} {'%.1f MB' % (p.stat().st_size / 1e6) if p.is_file() else 'MISSING'}")
 

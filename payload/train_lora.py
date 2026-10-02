@@ -45,6 +45,8 @@ LOCAL_WORK = Path(os.environ.get("P7_LOCAL_WORK", "/content/p7work"))
 DRIVE_ROOT = Path(os.environ.get("P7_DRIVE_BUS", "/content/drive/MyDrive/p7-hygda/bus")).parent
 
 RUN_NAME = os.environ.get("RUN_NAME", "clean")
+# v4 (2026-09-17): fixed-scale renders + feed/substrate captions; v3 zips stay on Drive
+DATASET_VERSION = os.environ.get("DATASET_VERSION", "v4")
 PILOT = os.environ.get("PILOT", "1") == "1"
 MAX_TRAIN_STEPS = int(os.environ.get("MAX_TRAIN_STEPS", "3000"))
 CHECKPOINTING_STEPS = int(os.environ.get("CHECKPOINTING_STEPS", "500"))
@@ -160,7 +162,7 @@ def prepare_dataset() -> Path:
     Returns:
         Path to the ``train/`` directory holding the images and ``metadata.csv``.
     """
-    zip_path = DRIVE_ROOT / f"hf_dataset_v3_{RUN_NAME}.zip"
+    zip_path = DRIVE_ROOT / f"hf_dataset_{DATASET_VERSION}_{RUN_NAME}.zip"
     if not zip_path.is_file():
         raise SystemExit(f"DATA_MISSING: {zip_path} not found on Drive")
     say(f"dataset zip: {zip_path} ({zip_path.stat().st_size / 1e6:.1f} MB)")
@@ -422,7 +424,7 @@ def main() -> int:
         return 1
 
     shutil.copy2(weights, OUT_DRIVE / weights.name)
-    zip_path = DRIVE_ROOT / f"hf_dataset_v3_{RUN_NAME}.zip"
+    zip_path = DRIVE_ROOT / f"hf_dataset_{DATASET_VERSION}_{RUN_NAME}.zip"
     lock = REPO_DIR / "payload" / "requirements.lock"
     manifest: dict[str, Any] = {
         "run_id": RUN_ID,
