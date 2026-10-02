@@ -1,0 +1,42 @@
+{
+  "attempt": 1,
+  "created_utc": "2026-10-02T12:05:46Z",
+  "deps_lock_sha256": "08d893a9ffab49a23eb4445234e374649eb0fc98a25e298b3dc705ed6beb88eb",
+  "drive_run_dir": "runs/clean",
+  "env": {
+    "CHECKPOINTING_STEPS": "250",
+    "DEPS_LOCK_SHA256": "08d893a9ffab49a23eb4445234e374649eb0fc98a25e298b3dc705ed6beb88eb",
+    "GRAD_ACCUM": "8",
+    "LR": "0.0001",
+    "LR_SCHEDULER": "cosine_with_restarts",
+    "LR_WARMUP_STEPS": "200",
+    "MAX_TRAIN_STEPS": "3000",
+    "MIXED_PRECISION": "fp16",
+    "MODEL_ID": "stable-diffusion-v1-5/stable-diffusion-v1-5",
+    "MODEL_REVISION": "451f4fe16113bff5a5d2269ed5ad43b0592e9a14",
+    "PILOT": "1",
+    "RANK": "32",
+    "RESOLUTION": "512",
+    "RUN_ID": "clean_v4_pilot_s3000",
+    "RUN_NAME": "clean",
+    "SEED": "42",
+    "TRAIN_BATCH_SIZE": "2"
+  },
+  "fix_class": null,
+  "fix_note": "fresh RUN_ID: clean_pilot_s3000 holds v3 checkpoint-2750; resuming would mix v3 weights into a v4 run",
+  "idempotency_key": "v4_pilot_3000_fresh",
+  "job_id": "20261002T1205Z-train_lora-clean-pilot-ba80",
+  "kind": "train_lora",
+  "parent_job_id": "20261002T0937Z-train_lora-clean-pilot-bb25",
+  "payload_args": [],
+  "payload_entry": "payload/train_lora.py",
+  "requires": {
+    "gpu": true,
+    "min_vram_gb": 14
+  },
+  "responding_to": null,
+  "resume": true,
+  "schema_version": 1,
+  "stall_s": 900,
+  "timeout_s": 43200
+}
