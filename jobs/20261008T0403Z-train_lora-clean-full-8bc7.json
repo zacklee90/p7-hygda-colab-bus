@@ -1,0 +1,43 @@
+{
+  "attempt": 1,
+  "created_utc": "2026-10-08T04:03:39Z",
+  "deps_lock_sha256": "08d893a9ffab49a23eb4445234e374649eb0fc98a25e298b3dc705ed6beb88eb",
+  "drive_run_dir": "runs/clean",
+  "env": {
+    "CHECKPOINTING_STEPS": "500",
+    "DATASET_VERSION": "v5",
+    "DEPS_LOCK_SHA256": "08d893a9ffab49a23eb4445234e374649eb0fc98a25e298b3dc705ed6beb88eb",
+    "GRAD_ACCUM": "8",
+    "LR": "0.0001",
+    "LR_SCHEDULER": "cosine_with_restarts",
+    "LR_WARMUP_STEPS": "200",
+    "MAX_TRAIN_STEPS": "6000",
+    "MIXED_PRECISION": "fp16",
+    "MODEL_ID": "stable-diffusion-v1-5/stable-diffusion-v1-5",
+    "MODEL_REVISION": "451f4fe16113bff5a5d2269ed5ad43b0592e9a14",
+    "PILOT": "0",
+    "RANK": "32",
+    "RESOLUTION": "512",
+    "RUN_ID": "clean_v5_full_s6000",
+    "RUN_NAME": "clean",
+    "SEED": "42",
+    "TRAIN_BATCH_SIZE": "2"
+  },
+  "fix_class": null,
+  "fix_note": "full 6000-step run on dataset v5 to close the P2 feed-type gap (pilot 3000: 0.727)",
+  "idempotency_key": "v5_full_6000",
+  "job_id": "20261008T0403Z-train_lora-clean-full-8bc7",
+  "kind": "train_lora",
+  "parent_job_id": null,
+  "payload_args": [],
+  "payload_entry": "payload/train_lora.py",
+  "requires": {
+    "gpu": true,
+    "min_vram_gb": 14
+  },
+  "responding_to": null,
+  "resume": true,
+  "schema_version": 1,
+  "stall_s": 900,
+  "timeout_s": 64800
+}
