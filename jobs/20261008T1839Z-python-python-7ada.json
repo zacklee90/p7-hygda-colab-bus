@@ -1,0 +1,27 @@
+{
+  "attempt": 1,
+  "created_utc": "2026-10-08T18:39:51Z",
+  "deps_lock_sha256": "08d893a9ffab49a23eb4445234e374649eb0fc98a25e298b3dc705ed6beb88eb",
+  "drive_run_dir": "runs/misc",
+  "env": {
+    "DEPS_LOCK_SHA256": "08d893a9ffab49a23eb4445234e374649eb0fc98a25e298b3dc705ed6beb88eb",
+    "RUN_ID": "clean_v5_full_s6000"
+  },
+  "fix_class": null,
+  "fix_note": null,
+  "idempotency_key": "eval_clean_v5_full_s6000",
+  "job_id": "20261008T1839Z-python-python-7ada",
+  "kind": "python",
+  "parent_job_id": null,
+  "payload_args": [],
+  "payload_entry": "payload/generate_lora.py",
+  "requires": {
+    "gpu": false,
+    "min_vram_gb": 0
+  },
+  "responding_to": null,
+  "resume": true,
+  "schema_version": 1,
+  "stall_s": 900,
+  "timeout_s": 7200
+}
