@@ -1,0 +1,32 @@
+{
+  "attempt": 1,
+  "created_utc": "2026-10-09T00:30:19Z",
+  "deps_lock_sha256": "08d893a9ffab49a23eb4445234e374649eb0fc98a25e298b3dc705ed6beb88eb",
+  "drive_run_dir": "runs/misc",
+  "env": {
+    "DEPS_LOCK_SHA256": "08d893a9ffab49a23eb4445234e374649eb0fc98a25e298b3dc705ed6beb88eb",
+    "GUIDANCE": "7.5",
+    "LORA_SCALE": "1.0",
+    "NEGATIVE_PROMPT": "blurry, low quality, distorted, artistic, painting, watermark, text, numbers, photorealistic",
+    "PROMPTS_CSV": "/content/drive/MyDrive/p7-hygda/eval/ar_002_2b1c7f9_s0/prompts.csv",
+    "RUN_ID": "clean_v5_full_s6000",
+    "STEPS": "30"
+  },
+  "fix_class": null,
+  "fix_note": "autoresearch 002: baseline: project default inference settings",
+  "idempotency_key": "ar_002_2b1c7f9_s0",
+  "job_id": "20261009T0030Z-python-python-7045",
+  "kind": "python",
+  "parent_job_id": null,
+  "payload_args": [],
+  "payload_entry": "payload/generate_lora.py",
+  "requires": {
+    "gpu": false,
+    "min_vram_gb": 0
+  },
+  "responding_to": null,
+  "resume": true,
+  "schema_version": 1,
+  "stall_s": 900,
+  "timeout_s": 1800
+}
